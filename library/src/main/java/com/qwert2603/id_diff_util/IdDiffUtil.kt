@@ -1,6 +1,6 @@
-package com.qwert2603.sorted_diff_util
+package com.qwert2603.id_diff_util
 
-object SortedDiffUtil {
+object IdDiffUtil {
 
     inline fun <T : Any, I : Any> List<T>.positionsById(crossinline itemId: T.() -> I): HashMap<I, Int> {
         val result = HashMap<I, Int>()
@@ -133,7 +133,7 @@ object SortedDiffUtil {
         crossinline itemId: T.() -> I,
         areContentsTheSame: (T, T) -> Boolean,
         getChangePayload: (T, T) -> Any?
-    ): SortedDiffResult {
+    ): IdDiffResult {
 
         val oldPositions: HashMap<I, Int> = oldList.positionsById(itemId)
         val newPositions: HashMap<I, Int> = newList.positionsById(itemId)
@@ -144,7 +144,7 @@ object SortedDiffUtil {
 
         val inserts: List<ItemsRange> = calculateInserts(newList, itemId, oldPositions)
 
-        return SortedDiffResult(
+        return IdDiffResult(
             removes = removes,
             moves = moves,
             changes = emptyList(),

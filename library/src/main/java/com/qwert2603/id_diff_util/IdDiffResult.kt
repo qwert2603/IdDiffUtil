@@ -1,8 +1,8 @@
-package com.qwert2603.sorted_diff_util
+package com.qwert2603.id_diff_util
 
 import androidx.recyclerview.widget.RecyclerView
 
-data class SortedDiffResult(
+data class IdDiffResult(
     val removes: List<ItemsRange>,
     val moves: List<ItemMove>,
     val changes: List<ItemChange>,

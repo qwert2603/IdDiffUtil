@@ -1,11 +1,9 @@
-package com.qwert2603.sorted_diff_util
+package com.qwert2603.id_diff_util
 
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListUpdateCallback
-import org.junit.Assert
 import org.junit.Test
 
-class qqqSortedDiffUtilTest {
+class qqqIdDiffUtilTest {
 
     data class Item(val id: Long, val name: String)
 
