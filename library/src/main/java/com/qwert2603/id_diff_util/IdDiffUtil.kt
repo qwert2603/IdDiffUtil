@@ -65,6 +65,7 @@ object IdDiffUtil {
 
         val oldFiltered: List<T> = oldList.filter { it.itemId() in newPositions }
         val newFiltered: List<T> = newList.filter { it.itemId() in oldPositions }
+        val oldFilteredPositions: HashMap<I, Int> = oldFiltered.positionsById(itemId)
 
         val movedIds = HashSet<I>()
 
@@ -79,7 +80,7 @@ object IdDiffUtil {
                 ++newIndex
                 continue
             }
-            var moveFrom = oldPositions[newFiltered[newIndex].itemId()]!!
+            var moveFrom = oldFilteredPositions[newFiltered[newIndex].itemId()]!!
             moves.forEach {
                 if (it.fromPosition > moveFrom) {
                     ++moveFrom
