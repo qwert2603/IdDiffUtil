@@ -1,6 +1,7 @@
 package com.qwert2603.sorted_diff_util
 
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 
 class SortedDiffUtilTest {
@@ -21,7 +22,6 @@ class SortedDiffUtilTest {
                 oldList = listOf(-1, 0, 1, 2, 3, 4, 5, 6),
                 newList = listOf(2, 4),
                 itemId = { this },
-                compareOrder = Int::compareTo,
                 areContentsTheSame = Int::equals,
                 getChangePayload = { _, _ -> null }
             )
@@ -38,31 +38,25 @@ class SortedDiffUtilTest {
                 inserts = emptyList()
             ),
             SortedDiffUtil.calculateDiff(
-                oldList = listOf(0, 1, 2, 3, 4, 5, 6),
-                newList = listOf(0, 1, 2, 5, 3, 4, 6),
+                oldList = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8),
+                newList = listOf(0, 1, 2, 5, 3, 4, 6, 7, 8),
                 itemId = { this },
-                compareOrder = Int::compareTo,
                 areContentsTheSame = Int::equals,
                 getChangePayload = { _, _ -> null }
             )
         )
-//return
+
         Assert.assertEquals(
             SortedDiffResult(
                 removes = emptyList(),
-                moves = listOf(
-                    ItemMove(3, 2),
-                    ItemMove(4, 3),
-                    ItemMove(5, 4)
-                ),
+                moves = listOf(ItemMove(2, 5)),
                 changes = emptyList(),
                 inserts = emptyList()
             ),
             SortedDiffUtil.calculateDiff(
-                oldList = listOf(0, 1, 2, 3, 4, 5, 6),
-                newList = listOf(0, 1, 3, 4, 5, 2, 6),
+                oldList = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8),
+                newList = listOf(0, 1, 3, 4, 5, 2, 6, 7, 8),
                 itemId = { this },
-                compareOrder = Int::compareTo,
                 areContentsTheSame = Int::equals,
                 getChangePayload = { _, _ -> null }
             )
@@ -79,7 +73,6 @@ class SortedDiffUtilTest {
                 oldList = listOf(0, 1, 2, 3, 4, 5, 6),
                 newList = listOf(4, 0, 1, 2, 3, 5, 6),
                 itemId = { this },
-                compareOrder = Int::compareTo,
                 areContentsTheSame = Int::equals,
                 getChangePayload = { _, _ -> null }
             )
@@ -88,10 +81,7 @@ class SortedDiffUtilTest {
         Assert.assertEquals(
             SortedDiffResult(
                 removes = emptyList(),
-                moves = listOf(
-                    ItemMove(5, 4),
-                    ItemMove(6, 5)
-                ),
+                moves = listOf(ItemMove(4, 6)),
                 changes = emptyList(),
                 inserts = emptyList()
             ),
@@ -99,7 +89,6 @@ class SortedDiffUtilTest {
                 oldList = listOf(0, 1, 2, 3, 4, 5, 6),
                 newList = listOf(0, 1, 2, 3, 5, 6, 4),
                 itemId = { this },
-                compareOrder = Int::compareTo,
                 areContentsTheSame = Int::equals,
                 getChangePayload = { _, _ -> null }
             )
@@ -116,7 +105,6 @@ class SortedDiffUtilTest {
                 oldList = listOf(0, 1, 2, 3, 4, 5, 6),
                 newList = listOf(6, 0, 1, 2, 3, 4, 5),
                 itemId = { this },
-                compareOrder = Int::compareTo,
                 areContentsTheSame = Int::equals,
                 getChangePayload = { _, _ -> null }
             )
@@ -125,7 +113,7 @@ class SortedDiffUtilTest {
         Assert.assertEquals(
             SortedDiffResult(
                 removes = emptyList(),
-                moves = (0..5).map { ItemMove(it + 1, it) },
+                moves = listOf(ItemMove(0, 6)),
                 changes = emptyList(),
                 inserts = emptyList()
             ),
@@ -133,7 +121,6 @@ class SortedDiffUtilTest {
                 oldList = listOf(0, 1, 2, 3, 4, 5, 6),
                 newList = listOf(1, 2, 3, 4, 5, 6, 0),
                 itemId = { this },
-                compareOrder = Int::compareTo,
                 areContentsTheSame = Int::equals,
                 getChangePayload = { _, _ -> null }
             )
@@ -158,7 +145,66 @@ class SortedDiffUtilTest {
                 oldList = listOf(0, 1, 2, 3, 4, 5, 6),
                 newList = listOf(0, 2, 5, 3, 4, 1, 6),
                 itemId = { this },
-                compareOrder = Int::compareTo,
+                areContentsTheSame = Int::equals,
+                getChangePayload = { _, _ -> null }
+            )
+        )
+
+        Assert.assertEquals(
+            SortedDiffResult(
+                removes = emptyList(),
+                moves = listOf(
+                    ItemMove(1, 3),
+                    ItemMove(9, 6)
+                ),
+                changes = emptyList(),
+                inserts = emptyList()
+            ),
+            SortedDiffUtil.calculateDiff(
+                oldList = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                newList = listOf(0, 2, 3, 1, 4, 5, 9, 6, 7, 8),
+                itemId = { this },
+                areContentsTheSame = Int::equals,
+                getChangePayload = { _, _ -> null }
+            )
+        )
+
+        Assert.assertEquals(
+            SortedDiffResult(
+                removes = emptyList(),
+                moves = listOf(
+                    ItemMove(3, 1),
+                    ItemMove(6, 9)
+                ),
+                changes = emptyList(),
+                inserts = emptyList()
+            ),
+            SortedDiffUtil.calculateDiff(
+                oldList = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                newList = listOf(0, 3, 1, 2, 4, 5, 7, 8, 9, 6),
+                itemId = { this },
+                areContentsTheSame = Int::equals,
+                getChangePayload = { _, _ -> null }
+            )
+        )
+    }
+
+    @Test
+    fun `nested moves`() {
+        Assert.assertEquals(
+            SortedDiffResult(
+                removes = emptyList(),
+                moves = listOf(
+                    ItemMove(5, 1),
+                    ItemMove(4, 7)
+                ),
+                changes = emptyList(),
+                inserts = emptyList()
+            ),
+            SortedDiffUtil.calculateDiff(
+                oldList = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                newList = listOf(0, 5, 1, 2, 4, 6, 7, 3, 8, 9),
+                itemId = { this },
                 areContentsTheSame = Int::equals,
                 getChangePayload = { _, _ -> null }
             )
@@ -182,10 +228,23 @@ class SortedDiffUtilTest {
                 oldList = listOf(2, 4),
                 newList = listOf(-1, 0, 1, 2, 3, 4, 5, 6),
                 itemId = { this },
-                compareOrder = Int::compareTo,
                 areContentsTheSame = Int::equals,
                 getChangePayload = { _, _ -> null }
             )
         )
+    }
+
+    @Test
+    @Ignore
+    fun perf() {
+        repeat(1000000) {
+            val diff = SortedDiffUtil.calculateDiff(
+                oldList = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19),
+                newList = listOf(0, 3, 1, 2, 4, 5, 7, 8, 9, 6, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19),
+                itemId = { this },
+                areContentsTheSame = Int::equals,
+                getChangePayload = { _, _ -> null }
+            )
+        }
     }
 }

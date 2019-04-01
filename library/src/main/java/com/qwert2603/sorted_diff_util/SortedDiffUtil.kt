@@ -2,15 +2,15 @@ package com.qwert2603.sorted_diff_util
 
 object SortedDiffUtil {
 
-    private fun <T : Any, I : Any> List<T>.positionsById(itemId: T.() -> I): HashMap<I, Int> {
+    inline fun <T : Any, I : Any> List<T>.positionsById(crossinline itemId: T.() -> I): HashMap<I, Int> {
         val result = HashMap<I, Int>()
         this.forEachIndexed { index, t -> result[t.itemId()] = index }
         return result
     }
 
-    private fun <T : Any, I : Any> calculateRemoves(
+    inline fun <T : Any, I : Any> calculateRemoves(
         oldList: List<T>,
-        itemId: T.() -> I,
+        crossinline itemId: T.() -> I,
         newPositions: HashMap<I, Int>
     ): List<ItemsRange> {
         val removes = mutableListOf<ItemsRange>()
@@ -31,9 +31,9 @@ object SortedDiffUtil {
         return removes
     }
 
-    private fun <T : Any, I : Any> calculateInserts(
+    inline fun <T : Any, I : Any> calculateInserts(
         newList: List<T>,
-        itemId: T.() -> I,
+        crossinline itemId: T.() -> I,
         oldPositions: HashMap<I, Int>
     ): List<ItemsRange> {
         val inserts = mutableListOf<ItemsRange>()
@@ -54,11 +54,83 @@ object SortedDiffUtil {
         return inserts
     }
 
-    fun <T : Any, I : Any> calculateDiff(
+    inline fun <T : Any, I : Any> calculateMoves(
         oldList: List<T>,
         newList: List<T>,
-        itemId: T.() -> I,
-        compareOrder: (T, T) -> Int,
+        crossinline itemId: T.() -> I,
+        oldPositions: HashMap<I, Int>,
+        newPositions: HashMap<I, Int>
+    ): List<ItemMove> {
+        val moves = mutableListOf<ItemMove>()
+
+        val oldFiltered: List<T> = oldList.filter { it.itemId() in newPositions }
+        val newFiltered: List<T> = newList.filter { it.itemId() in oldPositions }
+
+        val movedIds = HashSet<I>()
+
+        var oldIndex = 0
+        var newIndex = 0
+        while (newIndex < newFiltered.size) {
+            while (oldFiltered[oldIndex].itemId() in movedIds) {
+                ++oldIndex
+            }
+            if (oldFiltered[oldIndex].itemId() == newFiltered[newIndex].itemId()) {
+                ++oldIndex
+                ++newIndex
+                continue
+            }
+            var moveFrom = oldPositions[newFiltered[newIndex].itemId()]!!
+            moves.forEach {
+                if (it.fromPosition > moveFrom) {
+                    ++moveFrom
+                }
+            }
+            if (moveFrom == newIndex) {
+//                println("moveFrom == newIndex == $moveFrom")
+                ++newIndex
+                continue
+            }
+
+            var movedCount = 1
+            var qOldIndex = moveFrom + 1
+            while (qOldIndex < oldFiltered.size && oldFiltered[qOldIndex].itemId() in movedIds) {
+                ++qOldIndex
+            }
+            var qNewIndex = newIndex + 1
+            while (qOldIndex < oldFiltered.size && oldFiltered[qOldIndex].itemId() == newFiltered[qNewIndex].itemId()) {
+                ++movedCount
+                ++qOldIndex
+                while (qOldIndex < oldFiltered.size && oldFiltered[qOldIndex].itemId() in movedIds) {
+                    ++qOldIndex
+                }
+                ++qNewIndex
+            }
+
+//            println("be $moveFrom $newIndex $movedCount")
+            if (Math.abs(moveFrom - newIndex) < movedCount) {
+                val tFrom = moveFrom
+                val tTo = newIndex
+                val tCount = movedCount
+                moveFrom = tTo
+                newIndex = newIndex + tCount
+                movedCount = tFrom - tTo
+            }
+//            println("af $moveFrom $newIndex $movedCount")
+
+            for (i in 0 until movedCount) {
+                moves.add(ItemMove(moveFrom + i, newIndex + i))
+                movedIds.add(newFiltered[newIndex + i].itemId())
+            }
+            newIndex += movedCount
+        }
+
+        return moves
+    }
+
+    inline fun <T : Any, I : Any> calculateDiff(
+        oldList: List<T>,
+        newList: List<T>,
+        crossinline itemId: T.() -> I,
         areContentsTheSame: (T, T) -> Boolean,
         getChangePayload: (T, T) -> Any?
     ): SortedDiffResult {
@@ -68,14 +140,13 @@ object SortedDiffUtil {
 
         val removes: List<ItemsRange> = calculateRemoves(oldList, itemId, newPositions)
 
-        val oldFiltered = oldList.filter { it.itemId() in newPositions }
-        val newFiltered = newList.filter { it.itemId() in oldPositions }
+        val moves: List<ItemMove> = calculateMoves(oldList, newList, itemId, oldPositions, newPositions)
 
         val inserts: List<ItemsRange> = calculateInserts(newList, itemId, oldPositions)
 
         return SortedDiffResult(
             removes = removes,
-            moves = emptyList(),
+            moves = moves,
             changes = emptyList(),
             inserts = inserts
         )

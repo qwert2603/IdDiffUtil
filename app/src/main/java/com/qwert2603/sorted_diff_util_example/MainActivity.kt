@@ -14,7 +14,6 @@ class MainActivity : AppCompatActivity() {
             oldList = listOf(1, 2, 3),
             newList = listOf(2, 3, 4),
             itemId = { this },
-            compareOrder = Int::compareTo,
             areContentsTheSame = Int::equals,
             getChangePayload = { _, _ -> null }
         )
