@@ -6,10 +6,28 @@ import org.junit.Test
 
 class qqqIdDiffUtilTest {
 
-    data class Item(val id: Long, val name: String)
+    private data class Item(val id: Long, val name: String)
+
+    private val printingListUpdateCallback = object : ListUpdateCallback {
+        override fun onChanged(position: Int, count: Int, payload: Any?) {
+            println("onChanged $position $count")
+        }
+
+        override fun onMoved(fromPosition: Int, toPosition: Int) {
+            println("onMoved $fromPosition $toPosition")
+        }
+
+        override fun onInserted(position: Int, count: Int) {
+            println("onInserted $position $count")
+        }
+
+        override fun onRemoved(position: Int, count: Int) {
+            println("onRemoved $position $count")
+        }
+    }
 
     @Test
-    fun `q q`() {
+    fun q() {
         val old = listOf(
             Item(1, "a"),
             Item(2, "b"),
@@ -35,23 +53,26 @@ class qqqIdDiffUtilTest {
                 old[oldItemPosition] == new[newItemPosition]
         })
 //        }
-        diffResult.dispatchUpdatesTo(object : ListUpdateCallback {
-            override fun onChanged(position: Int, count: Int, payload: Any?) {
-                println("onChanged $position $count")
-            }
 
-            override fun onMoved(fromPosition: Int, toPosition: Int) {
-                println("onMoved $fromPosition $toPosition")
-            }
+        diffResult.dispatchUpdatesTo(printingListUpdateCallback)
+    }
 
-            override fun onInserted(position: Int, count: Int) {
-                println("onInserted $position $count")
-            }
+    @Test
+    fun w() {
+        val old = listOf(0, 1, 2, 3, 4, 5, 6)
+        val new = listOf(2, 3, 4, 0, 5, 1, 6)
 
-            override fun onRemoved(position: Int, count: Int) {
-                println("onRemoved $position $count")
-            }
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int = old.size
+            override fun getNewListSize(): Int = new.size
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                old[oldItemPosition] == new[newItemPosition]
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                old[oldItemPosition] == new[newItemPosition]
         })
+
+        diffResult.dispatchUpdatesTo(printingListUpdateCallback)
     }
 
 

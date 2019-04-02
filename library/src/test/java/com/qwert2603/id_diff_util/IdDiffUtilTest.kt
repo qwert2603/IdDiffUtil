@@ -129,6 +129,26 @@ class IdDiffUtilTest {
 
     @Test
     fun `many moves`() {
+        // fixme: fails
+        Assert.assertEquals(
+            IdDiffResult(
+                removes = emptyList(),
+                moves = listOf(
+                    ItemMove(1, 5),
+                    ItemMove(0, 3)
+                ),
+                changes = emptyList(),
+                inserts = emptyList()
+            ),
+            IdDiffUtil.calculateDiff(
+                oldList = listOf(0, 1, 2, 3, 4, 5, 6),
+                newList = listOf(2, 3, 4, 0, 5, 1, 6),
+                itemId = { this },
+                areContentsTheSame = Int::equals,
+                getChangePayload = { _, _ -> null }
+            )
+        )
+
         Assert.assertEquals(
             IdDiffResult(
                 removes = emptyList(),
@@ -187,6 +207,28 @@ class IdDiffUtilTest {
                 getChangePayload = { _, _ -> null }
             )
         )
+
+        Assert.assertEquals(
+            IdDiffResult(
+                removes = emptyList(),
+                moves = listOf(
+                    ItemMove(3, 0),
+                    ItemMove(3, 1),
+                    ItemMove(7, 2),
+                    ItemMove(7, 3),
+                    ItemMove(9, 4)
+                ),
+                changes = emptyList(),
+                inserts = emptyList()
+            ),
+            IdDiffUtil.calculateDiff(
+                oldList = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                newList = listOf(3, 2, 7, 6, 9, 0, 1, 4, 5, 8),
+                itemId = { this },
+                areContentsTheSame = Int::equals,
+                getChangePayload = { _, _ -> null }
+            )
+        )
     }
 
     @Test
@@ -238,7 +280,7 @@ class IdDiffUtilTest {
     @Ignore
     fun perf() {
         repeat(1000000) {
-            val diff = IdDiffUtil.calculateDiff(
+            IdDiffUtil.calculateDiff(
                 oldList = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19),
                 newList = listOf(0, 3, 1, 2, 4, 5, 7, 8, 9, 6, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19),
                 itemId = { this },

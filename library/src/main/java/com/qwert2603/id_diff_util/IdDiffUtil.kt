@@ -72,6 +72,7 @@ object IdDiffUtil {
         var oldIndex = 0
         var newIndex = 0
         while (newIndex < newFiltered.size) {
+            println("kk $newIndex")
             while (oldFiltered[oldIndex].itemId() in movedIds) {
                 ++oldIndex
             }
@@ -82,22 +83,27 @@ object IdDiffUtil {
             }
             var moveFrom = oldFilteredPositions[newFiltered[newIndex].itemId()]!!
             moves.forEach {
-                if (it.fromPosition > moveFrom) {
+                if (it.fromPosition > moveFrom && it.toPosition < moveFrom) {
                     ++moveFrom
+                }
+                if (it.fromPosition < moveFrom && it.toPosition > moveFrom) {
+                    --moveFrom
                 }
             }
             if (moveFrom == newIndex) {
-//                println("moveFrom == newIndex == $moveFrom")
+                println("moveFrom == newIndex == $moveFrom")
                 ++newIndex
                 continue
             }
 
+            println("dd $moveFrom $newIndex")
             var movedCount = 1
             var qOldIndex = moveFrom + 1
             while (qOldIndex < oldFiltered.size && oldFiltered[qOldIndex].itemId() in movedIds) {
                 ++qOldIndex
             }
             var qNewIndex = newIndex + 1
+            println("ff $qOldIndex $qNewIndex")
             while (qOldIndex < oldFiltered.size && oldFiltered[qOldIndex].itemId() == newFiltered[qNewIndex].itemId()) {
                 ++movedCount
                 ++qOldIndex
@@ -107,7 +113,7 @@ object IdDiffUtil {
                 ++qNewIndex
             }
 
-//            println("be $moveFrom $newIndex $movedCount")
+            println("be $moveFrom $newIndex $movedCount")
             if (Math.abs(moveFrom - newIndex) < movedCount) {
                 val tFrom = moveFrom
                 val tTo = newIndex
@@ -116,7 +122,7 @@ object IdDiffUtil {
                 newIndex = newIndex + tCount
                 movedCount = tFrom - tTo
             }
-//            println("af $moveFrom $newIndex $movedCount")
+            println("af $moveFrom $newIndex $movedCount")
 
             for (i in 0 until movedCount) {
                 moves.add(ItemMove(moveFrom + i, newIndex + i))
